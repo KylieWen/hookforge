@@ -1,0 +1,17 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "hookforge-safe-test-runner",
+      "description": "Example standalone IDE 1.x hook: run HookForge tests after agent-edited Python files are saved.",
+      "trigger": "PostFileSave",
+      "matcher": "\\.py$",
+      "action": {
+        "type": "command",
+        "command": "python -m unittest discover -s tests -v"
+      },
+      "timeout": 120,
+      "enabled": true
+    }
+  ]
+}
