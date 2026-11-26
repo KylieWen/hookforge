@@ -14,6 +14,12 @@
   let latestValidation = { valid: false, issues: [] };
   let toastTimer;
   let busyTimer;
+  const demoMode = new URLSearchParams(window.location.search).get("demo") === "1";
+  let demoData = null;
+  if (demoMode) {
+    document.querySelector(".safe-pill").textContent = "Static demo · no backend";
+    document.querySelector(".brand").href = "./?demo=1";
+  }
 
   function showToast(message, error = false) {
     clearTimeout(toastTimer);
@@ -22,7 +28,47 @@
     toastTimer = setTimeout(() => { $("toast").className = ""; }, 2800);
   }
 
+  async function ensureDemoData() {
+    if (demoData) return;
+    const response = await fetch("./demo-data.json");
+    if (!response.ok) throw new Error("Static demo data could not be loaded.");
+    demoData = await response.json();
+  }
+
+  function canonical(value) {
+    if (Array.isArray(value)) return value.map(canonical);
+    if (value && typeof value === "object") {
+      return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])]));
+    }
+    return value;
+  }
+
+  function demoSampleFor(hook) {
+    const target = JSON.stringify(canonical(hook));
+    return Object.values(demoData.samples).find((sample) => JSON.stringify(canonical(sample.hook)) === target);
+  }
+
+  async function demoApi(path, body) {
+    await ensureDemoData();
+    if (path === "/api/meta") return demoData.meta;
+    const sample = demoSampleFor(body?.hook);
+    if (!sample) throw new Error(demoData.notice);
+    if (path === "/api/validate") return sample.validation;
+    if (path === "/api/risk") return sample.risk;
+    if (path === "/api/export") {
+      if (body.filename) throw new Error("Static demo export uses the bundled filename. Run the local app for custom names.");
+      return sample.export;
+    }
+    if (path === "/api/simulate") {
+      const entry = sample.simulations.find((item) => item.event.trigger === body.event?.trigger && item.event.subject === body.event?.subject);
+      if (!entry) throw new Error("Static demo includes bundled event subjects only. Run the local app for arbitrary events.");
+      return entry.result;
+    }
+    throw new Error("Unsupported static demo request.");
+  }
+
   async function api(path, body) {
+    if (demoMode) return demoApi(path, body);
     const response = await fetch(path, {
       method: body === undefined ? "GET" : "POST",
       headers: body === undefined ? undefined : { "Content-Type": "application/json" },
@@ -141,7 +187,7 @@
       if (sequence !== validationSequence) return;
       clearTimeout(busyTimer);
       latestValidation = { valid: false, issues: [] };
-      $("schema-badge").textContent = "SERVER OFFLINE";
+      $("schema-badge").textContent = demoMode ? "STATIC DEMO LIMIT" : "SERVER OFFLINE";
       renderValidation({ valid: false, issues: [{ severity: "error", message: error.message }] });
       $("download-button").disabled = true;
       renderRisk({ warnings: [], summary: { high: 0, medium: 0 }, advisory: "Risk scan unavailable." });
@@ -214,6 +260,7 @@
     const trigger = triggers.find((entry) => entry.name === $("event-trigger").value);
     if (!trigger) return;
     const tool = trigger.subject === "tool name";
+    if (!trigger.subject) $("event-subject").value = "";
     $("event-subject-label").textContent = tool ? "Tool name" : trigger.subject === "prompt text" ? "Prompt text" : trigger.subject === "file path" ? "File path" : "Event subject";
     $("event-subject").placeholder = tool ? "fs_write" : trigger.subject === "prompt text" ? "Please refactor this module" : trigger.subject === "file path" ? "src/example.py" : "(no matcher subject)";
     $("event-subject").disabled = !trigger.subject;
@@ -260,6 +307,13 @@
     document.querySelector(`input[name="action-type"][value="${hook.action.type}"]`).checked = true;
     $("filename").value = "";
     currentActionType = hook.action.type;
+    if (demoMode && demoData) {
+      const sample = demoSampleFor(hook);
+      if (sample) {
+        $("event-trigger").value = sample.default_event.trigger;
+        $("event-subject").value = sample.default_event.subject;
+      }
+    }
     updateActionType();
     updateTrigger();
     $("builder").scrollIntoView({ behavior: "smooth", block: "start" });

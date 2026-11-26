@@ -39,7 +39,7 @@ Kiro's original line references were approximate. The locations below are verifi
 
 ## Verification after fixes
 
-- `python -m unittest discover -s tests -v`: **90/90 passed** in 3.010 seconds.
+- `python -m unittest discover -s tests -v`: **94/94 passed** after review fixes, static-demo synchronization tests, and Pages-safe asset URL tests.
 - `python scripts/benchmark.py`: **24/24 expectations met**.
 - `python scripts/smoke_test.py`: **10/10 checks passed** against the real local server.
 - `node --check frontend/app.js`: passed.
@@ -47,6 +47,10 @@ Kiro's original line references were approximate. The locations below are verifi
   - Dangerous matcher `(a+)+$` remained exportable but simulation stopped safely with "Regex repetition is not applied in the safe simulator."
   - Tool wildcard `mcp_*_query` matched synthetic tool `mcp_db_query`.
   - Simulation displayed the requested command with `EXECUTED: FALSE` and did not execute it.
+- Browser verification against the backend-free `http://127.0.0.1:8768/?demo=1`:
+  - All three bundled templates loaded with current validation and risk data.
+  - PostFileSave, PreToolUse, and Stop simulations matched backend-generated results.
+  - Unsupported edits are labeled as a static-demo limit rather than a server failure.
 
 ## Kiro conclusion excerpt
 

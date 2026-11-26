@@ -189,6 +189,8 @@ class HookForgeHandler(BaseHTTPRequestHandler):
         length_values = self.headers.get_all("Content-Length", [])
         if len(length_values) != 1:
             self.close_connection = True
+            if len(set(length_values)) == 1:
+                self._discard_small_body()
             self._error(400, "invalid_input", "Exactly one Content-Length header is required.")
             return
         length_text = length_values[0].strip()

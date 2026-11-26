@@ -24,6 +24,17 @@ python run.py --host localhost
 
 The server binds to loopback only. Press Ctrl+C to stop.
 
+## Static demo
+
+For GitHub Pages or any static host, serve the `frontend/` directory and open `?demo=1`:
+
+```bash
+python -m http.server 8768 --directory frontend
+# http://127.0.0.1:8768/?demo=1
+```
+
+The static demo uses `frontend/demo-data.json`, generated from the same pure backend by `python build_demo_data.py`. It supports the three bundled templates and their documented synthetic events, including validation, risk output, inert simulation, and JSON download. Editing a bundled hook or using an unlisted event shows a clear static-demo limit; run the local app for arbitrary input.
+
 ## Safety contract
 
 - The backend uses only Python's standard library; the frontend is vanilla HTML/CSS/JS.
@@ -97,7 +108,7 @@ python scripts/smoke_test.py
 node --check frontend/app.js  # optional, if Node is available
 ```
 
-The deterministic suite covers schema/action boundaries, all canonical triggers, regex failures, risk classes, simulation outcomes, export naming, API payload limits and routes, fixed benchmark expectations, and non-execution using marker files plus process-spawn spies.
+The deterministic 94-test suite covers schema/action boundaries, all canonical triggers, regex failures, risk classes, simulation outcomes, export naming, API payload limits and routes, fixed benchmark expectations, static-demo synchronization, Pages-safe asset URLs, and non-execution using marker files plus process-spawn spies.
 
 The fixed 24-case report is in `benchmarks/validation-benchmark.md`; its source fixtures are in `benchmarks/validation-cases.json`. It measures HookForge's own documented contract, not official Kiro certification.
 
@@ -120,8 +131,9 @@ POST requests require `application/json`. Validation results use HTTP 200 with `
 - `run.py` — CLI entry point and loopback server launcher
 - `server.py` — fixed-route HTTP server and input boundaries
 - `hookforge_core.py` — pure schema, regex, risk, naming, simulation, catalogs
-- `frontend/` — responsive vanilla studio
-- `tests/` — deterministic core, API, and benchmark tests
+- `frontend/` — responsive vanilla studio and backend-free `?demo=1` payload
+- `build_demo_data.py` — regenerates static demo results from the pure backend
+- `tests/` — deterministic core, API, benchmark, and static-demo tests
 - `scripts/smoke_test.py` — launches a real local server and probes HTTP
 - `benchmarks/` — fixed validation fixtures and generated report
 - `.kiro/specs/` — requirements, design, and task record
