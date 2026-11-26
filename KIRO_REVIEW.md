@@ -51,6 +51,7 @@ Kiro's original line references were approximate. The locations below are verifi
   - All three bundled templates loaded with current validation and risk data.
   - PostFileSave, PreToolUse, and Stop simulations matched backend-generated results.
   - Unsupported edits are labeled as a static-demo limit rather than a server failure.
+  - Re-importing a bundled export succeeded in both local and static demo modes; invalid hooks were rejected without replacing the current form.
 
 ## Kiro conclusion excerpt
 

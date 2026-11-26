@@ -51,6 +51,12 @@
   async function demoApi(path, body) {
     await ensureDemoData();
     if (path === "/api/meta") return demoData.meta;
+    if (path === "/api/document") {
+      const target = JSON.stringify(canonical(body?.document));
+      const sample = Object.values(demoData.samples).find((item) => JSON.stringify(canonical(item.export.document)) === target);
+      if (!sample) throw new Error(demoData.notice);
+      return { valid: true, document: body.document, issues: [] };
+    }
     const sample = demoSampleFor(body?.hook);
     if (!sample) throw new Error(demoData.notice);
     if (path === "/api/validate") return sample.validation;
@@ -317,7 +323,31 @@
     updateActionType();
     updateTrigger();
     $("builder").scrollIntoView({ behavior: "smooth", block: "start" });
-    showToast("Template loaded. Make it yours.");
+    showToast("Hook loaded. Make it yours.");
+  }
+
+  async function importHook(file) {
+    if (!file) return;
+    if (file.size > 65_536) {
+      showToast("Hook files must be at most 64 KiB.", true);
+      return;
+    }
+    try {
+      const document = JSON.parse(await file.text());
+      const result = await api("/api/document", { document });
+      if (!result.valid) {
+        showToast(result.issues?.[0]?.message || "The hook file is invalid.", true);
+        return;
+      }
+      if (result.document.hooks.length !== 1) {
+        showToast("Import a file containing exactly one hook.", true);
+        return;
+      }
+      loadHook(result.document.hooks[0]);
+      showToast("Hook imported. Review it before export.");
+    } catch (error) {
+      showToast(error.message || "The JSON file could not be imported.", true);
+    }
   }
 
   function renderSimulation(result) {
@@ -455,6 +485,11 @@
   fields.trigger.addEventListener("change", updateTrigger);
   $("event-trigger").addEventListener("change", updateEventSubject);
   $("filename").addEventListener("input", derivePath);
+  $("import-button").addEventListener("click", () => $("import-file").click());
+  $("import-file").addEventListener("change", (event) => {
+    importHook(event.target.files[0]);
+    event.target.value = "";
+  });
   $("reset-button").addEventListener("click", () => templates[0] && loadHook(templates[0].hook));
   $("simulate-button").addEventListener("click", simulate);
   $("download-button").addEventListener("click", download);

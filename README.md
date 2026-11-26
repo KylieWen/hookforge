@@ -33,7 +33,7 @@ python -m http.server 8768 --directory frontend
 # http://127.0.0.1:8768/?demo=1
 ```
 
-The static demo uses `frontend/demo-data.json`, generated from the same pure backend by `python build_demo_data.py`. It supports the three bundled templates and their documented synthetic events, including validation, risk output, inert simulation, and JSON download. Editing a bundled hook or using an unlisted event shows a clear static-demo limit; run the local app for arbitrary input.
+The static demo uses `frontend/demo-data.json`, generated from the same pure backend by `python build_demo_data.py`. It supports the three bundled templates and their documented synthetic events, including validation, risk output, inert simulation, JSON download, and re-importing a bundled export. Editing a bundled hook or using an unlisted event shows a clear static-demo limit; run the local app for arbitrary input.
 
 ## Safety contract
 
@@ -50,6 +50,7 @@ The static demo uses `frontend/demo-data.json`, generated from the same pure bac
 ### Build and inspect
 
 - Name, description, canonical trigger, matcher, command/agent action, command timeout, and enabled switch.
+- Import a valid single-hook `version: "v1"` JSON file through the same backend document validator.
 - All 13 documented canonical IDE 1.x trigger names in the 26 November 2026 snapshot.
 - Live schema validation with field-specific issues; regex compilation feedback.
 - Agent-only PermissionRequest restriction, action-specific field checks, and unsupported matcher guidance.
@@ -148,7 +149,7 @@ References checked **26 November 2026**:
 - https://kiro.dev/docs/hooks/types/
 - https://kiro.dev/docs/ide/whats-new-v1/hooks/
 
-MVP gaps: one hook per builder/export; no import, persistence, multi-hook editor, `confirm`/`confirmCommand` editor, automatic template-variable substitution, or real STDIN payload generator. Tool-category membership is illustrative and may not enumerate every installed tool ID. Python regex semantics approximate—but do not certify—Kiro runtime matching. Simulation does not execute commands, evaluate exit codes, model hook ordering, or contact Kiro. A real Kiro IDE 1.4.236 review and disposition are recorded in `KIRO_REVIEW.md`.
+MVP gaps: one hook per builder/export; no persistence, multi-hook editor, `confirm`/`confirmCommand` editor, automatic template-variable substitution, or real STDIN payload generator. Tool-category membership is illustrative and may not enumerate every installed tool ID. Python regex semantics approximate—but do not certify—Kiro runtime matching. Simulation does not execute commands, evaluate exit codes, model hook ordering, or contact Kiro. A real Kiro IDE 1.4.236 review and disposition are recorded in `KIRO_REVIEW.md`.
 
 ## License
 

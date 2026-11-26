@@ -43,6 +43,8 @@ class StaticDemoTests(unittest.TestCase):
         html = (ROOT / "frontend" / "index.html").read_text(encoding="utf-8")
         self.assertIn('href="./styles.css"', html)
         self.assertIn('src="./app.js"', html)
+        self.assertIn('id="import-button"', html)
+        self.assertIn('id="import-file"', html)
         self.assertNotRegex(html, r'(?:href|src)="/[^#]')
         self.assertTrue((ROOT / "frontend" / ".nojekyll").exists())
 

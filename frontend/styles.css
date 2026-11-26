@@ -67,6 +67,7 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.6px; font-weight: 630; }
 h3 { margin: 0; font-size: 15px; }
 .text-button { border: 0; background: transparent; color: var(--muted); font-size: 12px; padding: 6px 0 6px 12px; }
 .text-button:hover { color: var(--lime); }
+.panel-actions { display: flex; align-items: center; gap: 14px; }
 form { padding: 24px 26px 0; }
 .field-grid { display: grid; gap: 16px; }
 .field-grid.two { grid-template-columns: 1fr 1fr; }

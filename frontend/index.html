@@ -38,7 +38,8 @@
 
     <section class="workspace" id="builder" aria-label="Hook builder">
       <div class="panel form-panel">
-        <div class="panel-heading"><div><p class="section-kicker">01 / COMPOSE</p><h2>Hook definition</h2></div><button class="text-button" id="reset-button" type="button">Reset</button></div>
+        <div class="panel-heading"><div><p class="section-kicker">01 / COMPOSE</p><h2>Hook definition</h2></div><div class="panel-actions"><button class="text-button" id="import-button" type="button">Import JSON</button><button class="text-button" id="reset-button" type="button">Reset</button></div></div>
+        <input id="import-file" type="file" accept="application/json,.json" hidden>
         <form id="hook-form" autocomplete="off">
           <div class="field-grid two">
             <label class="field"><span>Name <b aria-hidden="true">*</b></span><input id="name" name="name" maxlength="200" required placeholder="Test Python on save"><small>A human-readable identifier.</small></label>
