@@ -16,7 +16,7 @@ def main() -> int:
     cases = json.loads((ROOT / "benchmarks/validation-cases.json").read_text(encoding="utf-8"))
     rows = []
     for case in cases:
-        document = {"version": case.get("version", "v1"), "hooks": case.get("hooks", [case["hook"]])}
+        document = case["document"] if "document" in case else {"version": case.get("version", "v1"), "hooks": case.get("hooks", [case["hook"]])}
         result = validate_document(document)
         actual_codes = {issue["code"] for issue in result["issues"] if issue["severity"] == "error"}
         passed = result["valid"] == case["expected_valid"]
@@ -24,14 +24,18 @@ def main() -> int:
             passed = passed and case["expected_code"] in actual_codes
         rows.append({**case, "passed": passed, "actual_codes": sorted(actual_codes)})
     passed_count = sum(row["passed"] for row in rows)
+    valid_count = sum(row["expected_valid"] for row in rows)
     negative_count = sum(not row["expected_valid"] for row in rows)
+    trigger_rows = [row for row in rows if row["category"] == "trigger" and row["expected_valid"]]
+    trigger_passed = sum(row["passed"] for row in trigger_rows)
     lines = [
         "# HookForge fixed validation benchmark", "",
         "Snapshot: 26 November 2026. Engine: `hookforge_core.validate_document`.", "",
         "This is a small, original, deterministic conformance benchmark for HookForge's documented MVP contract—not an official Kiro certification or a measurement of real IDE behavior.", "",
         "| Metric | Result |", "|---|---:|",
         f"| Fixed cases | {len(rows)} |",
-        f"| Canonical trigger acceptance | {len(rows) - negative_count}/{len(rows) - negative_count} |",
+        f"| Valid-document acceptance | {sum(row['passed'] for row in rows if row['expected_valid'])}/{valid_count} |",
+        f"| Canonical trigger acceptance | {trigger_passed}/{len(trigger_rows)} |",
         f"| Invalid-schema rejection | {sum(row['passed'] for row in rows if not row['expected_valid'])}/{negative_count} |",
         f"| Total expectations met | {passed_count}/{len(rows)} ({passed_count / len(rows):.1%}) |", "",
         "## Case results", "",

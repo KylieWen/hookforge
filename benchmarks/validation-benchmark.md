@@ -6,10 +6,11 @@ This is a small, original, deterministic conformance benchmark for HookForge's d
 
 | Metric | Result |
 |---|---:|
-| Fixed cases | 24 |
+| Fixed cases | 47 |
+| Valid-document acceptance | 18/18 |
 | Canonical trigger acceptance | 13/13 |
-| Invalid-schema rejection | 11/11 |
-| Total expectations met | 24/24 (100.0%) |
+| Invalid-schema rejection | 29/29 |
+| Total expectations met | 47/47 (100.0%) |
 
 ## Case results
 
@@ -39,5 +40,28 @@ This is a small, original, deterministic conformance benchmark for HookForge's d
 | `unknown-action-field` | negative | reject: `unknown_field` | `unknown_field` | PASS |
 | `stop-with-matcher` | negative | reject: `matcher_unsupported` | `matcher_unsupported` | PASS |
 | `empty-hooks` | negative | reject: `required` | `required` | PASS |
+| `timeout-zero-valid` | boundary | valid | none | PASS |
+| `timeout-max-valid` | boundary | valid | none | PASS |
+| `blank-optionals-valid` | boundary | valid | none | PASS |
+| `disabled-hook-valid` | boundary | valid | none | PASS |
+| `agent-action-valid` | action | valid | none | PASS |
+| `blank-name` | negative | reject: `required` | `required` | PASS |
+| `long-name` | negative | reject: `length` | `length` | PASS |
+| `description-type` | negative | reject: `type` | `type` | PASS |
+| `description-length` | negative | reject: `length` | `length` | PASS |
+| `unknown-hook-field` | negative | reject: `unknown_field` | `unknown_field` | PASS |
+| `action-type` | negative | reject: `action_type` | `action_type` | PASS |
+| `command-with-prompt` | negative | reject: `action_field` | `action_field` | PASS |
+| `agent-with-command` | negative | reject: `action_field` | `action_field` | PASS |
+| `negative-timeout` | negative | reject: `timeout_range` | `timeout_range` | PASS |
+| `oversized-timeout` | negative | reject: `timeout_range` | `timeout_range` | PASS |
+| `matcher-type` | negative | reject: `regex` | `regex` | PASS |
+| `matcher-length` | negative | reject: `regex` | `regex` | PASS |
+| `null-hook` | negative | reject: `type` | `type` | PASS |
+| `null-action` | negative | reject: `required` | `required` | PASS |
+| `unknown-top-level-field` | negative | reject: `unknown_field` | `unknown_field` | PASS |
+| `hooks-not-array` | negative | reject: `required` | `required` | PASS |
+| `too-many-hooks` | negative | reject: `length` | `length` | PASS |
+| `wrong-version-type` | negative | reject: `version` | `version` | PASS |
 
 Reproduce with `python scripts/benchmark.py`. Cases are fixed in `benchmarks/validation-cases.json`.

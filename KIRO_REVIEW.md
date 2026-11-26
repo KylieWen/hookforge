@@ -40,7 +40,7 @@ Kiro's original line references were approximate. The locations below are verifi
 ## Verification after fixes
 
 - `python -m unittest discover -s tests -v`: **94/94 passed** after review fixes, static-demo synchronization tests, and Pages-safe asset URL tests.
-- `python scripts/benchmark.py`: **24/24 expectations met**.
+- `python scripts/benchmark.py`: **47/47 expectations met** (13/13 canonical triggers, 18/18 valid documents, 29/29 invalid-schema rejections).
 - `python scripts/smoke_test.py`: **10/10 checks passed** against the real local server.
 - `node --check frontend/app.js`: passed.
 - Browser verification against `http://127.0.0.1:8767/`:

@@ -1,26 +1,1064 @@
 [
-  {"id": "trigger-session-start", "category": "trigger", "expected_valid": true, "hook": {"name": "Session setup", "trigger": "SessionStart", "action": {"type": "command", "command": "python --version"}}},
-  {"id": "trigger-user-prompt-submit", "category": "trigger", "expected_valid": true, "hook": {"name": "Prompt policy", "trigger": "UserPromptSubmit", "matcher": "deploy|release", "action": {"type": "command", "command": "python check_prompt.py"}}},
-  {"id": "trigger-stop", "category": "trigger", "expected_valid": true, "hook": {"name": "Stop tests", "trigger": "Stop", "action": {"type": "command", "command": "python -m unittest discover -s tests"}}},
-  {"id": "trigger-pre-task-exec", "category": "trigger", "expected_valid": true, "hook": {"name": "Task prerequisite", "trigger": "PreTaskExec", "action": {"type": "command", "command": "python check_setup.py"}}},
-  {"id": "trigger-post-task-exec", "category": "trigger", "expected_valid": true, "hook": {"name": "Task report", "trigger": "PostTaskExec", "action": {"type": "agent", "prompt": "Summarize the completed task."}}},
-  {"id": "trigger-pre-tool-use", "category": "trigger", "expected_valid": true, "hook": {"name": "Write guard", "trigger": "PreToolUse", "matcher": "write", "action": {"type": "command", "command": "python guard.py"}}},
-  {"id": "trigger-post-tool-use", "category": "trigger", "expected_valid": true, "hook": {"name": "Tool review", "trigger": "PostToolUse", "matcher": "fs_.*", "action": {"type": "agent", "prompt": "Review this result."}}},
-  {"id": "trigger-permission-request", "category": "trigger", "expected_valid": true, "hook": {"name": "Permission check", "trigger": "PermissionRequest", "matcher": "read_file", "action": {"type": "command", "command": "python permission.py"}}},
-  {"id": "trigger-post-file-create", "category": "trigger", "expected_valid": true, "hook": {"name": "New Python file", "trigger": "PostFileCreate", "matcher": "\\.py$", "action": {"type": "command", "command": "python add_tests.py"}}},
-  {"id": "trigger-post-file-save", "category": "trigger", "expected_valid": true, "hook": {"name": "Test on save", "trigger": "PostFileSave", "matcher": "\\.py$", "action": {"type": "command", "command": "python -m unittest discover -s tests"}}},
-  {"id": "trigger-post-file-delete", "category": "trigger", "expected_valid": true, "hook": {"name": "Deleted import cleanup", "trigger": "PostFileDelete", "matcher": "\\.py$", "action": {"type": "agent", "prompt": "Check for stale imports."}}},
-  {"id": "trigger-pre-compaction", "category": "trigger", "expected_valid": true, "hook": {"name": "Snapshot", "trigger": "PreCompaction", "action": {"type": "command", "command": "python snapshot.py"}}},
-  {"id": "trigger-post-compaction", "category": "trigger", "expected_valid": true, "hook": {"name": "Restore context", "trigger": "PostCompaction", "action": {"type": "agent", "prompt": "Recall the active task constraints."}}},
-  {"id": "legacy-camelcase-trigger", "category": "negative", "expected_valid": false, "expected_code": "trigger", "hook": {"name": "Legacy", "trigger": "fileEdited", "action": {"type": "command", "command": "true"}}},
-  {"id": "wrong-version", "category": "negative", "expected_valid": false, "expected_code": "version", "version": "1", "hook": {"name": "Wrong version", "trigger": "Stop", "action": {"type": "command", "command": "true"}}},
-  {"id": "missing-command", "category": "negative", "expected_valid": false, "expected_code": "required", "hook": {"name": "Missing command", "trigger": "Stop", "action": {"type": "command"}}},
-  {"id": "missing-agent-prompt", "category": "negative", "expected_valid": false, "expected_code": "required", "hook": {"name": "Missing prompt", "trigger": "Stop", "action": {"type": "agent"}}},
-  {"id": "boolean-timeout", "category": "negative", "expected_valid": false, "expected_code": "timeout_type", "hook": {"name": "Boolean timeout", "trigger": "Stop", "timeout": true, "action": {"type": "command", "command": "true"}}},
-  {"id": "string-enabled", "category": "negative", "expected_valid": false, "expected_code": "enabled_type", "hook": {"name": "String enabled", "trigger": "Stop", "enabled": "false", "action": {"type": "command", "command": "true"}}},
-  {"id": "broken-regex", "category": "negative", "expected_valid": false, "expected_code": "regex", "hook": {"name": "Broken regex", "trigger": "PostFileSave", "matcher": "[", "action": {"type": "command", "command": "true"}}},
-  {"id": "permission-agent-action", "category": "negative", "expected_valid": false, "expected_code": "action_unsupported", "hook": {"name": "Invalid permission action", "trigger": "PermissionRequest", "action": {"type": "agent", "prompt": "Ask the agent."}}},
-  {"id": "unknown-action-field", "category": "negative", "expected_valid": false, "expected_code": "unknown_field", "hook": {"name": "Unknown action field", "trigger": "Stop", "action": {"type": "command", "command": "true", "cwd": "/tmp"}}},
-  {"id": "stop-with-matcher", "category": "negative", "expected_valid": false, "expected_code": "matcher_unsupported", "hook": {"name": "Useless matcher", "trigger": "Stop", "matcher": ".*", "action": {"type": "command", "command": "true"}}},
-  {"id": "empty-hooks", "category": "negative", "expected_valid": false, "expected_code": "required", "hook": null, "hooks": []}
+  {
+    "id": "trigger-session-start",
+    "category": "trigger",
+    "expected_valid": true,
+    "hook": {
+      "name": "Session setup",
+      "trigger": "SessionStart",
+      "action": {
+        "type": "command",
+        "command": "python --version"
+      }
+    }
+  },
+  {
+    "id": "trigger-user-prompt-submit",
+    "category": "trigger",
+    "expected_valid": true,
+    "hook": {
+      "name": "Prompt policy",
+      "trigger": "UserPromptSubmit",
+      "matcher": "deploy|release",
+      "action": {
+        "type": "command",
+        "command": "python check_prompt.py"
+      }
+    }
+  },
+  {
+    "id": "trigger-stop",
+    "category": "trigger",
+    "expected_valid": true,
+    "hook": {
+      "name": "Stop tests",
+      "trigger": "Stop",
+      "action": {
+        "type": "command",
+        "command": "python -m unittest discover -s tests"
+      }
+    }
+  },
+  {
+    "id": "trigger-pre-task-exec",
+    "category": "trigger",
+    "expected_valid": true,
+    "hook": {
+      "name": "Task prerequisite",
+      "trigger": "PreTaskExec",
+      "action": {
+        "type": "command",
+        "command": "python check_setup.py"
+      }
+    }
+  },
+  {
+    "id": "trigger-post-task-exec",
+    "category": "trigger",
+    "expected_valid": true,
+    "hook": {
+      "name": "Task report",
+      "trigger": "PostTaskExec",
+      "action": {
+        "type": "agent",
+        "prompt": "Summarize the completed task."
+      }
+    }
+  },
+  {
+    "id": "trigger-pre-tool-use",
+    "category": "trigger",
+    "expected_valid": true,
+    "hook": {
+      "name": "Write guard",
+      "trigger": "PreToolUse",
+      "matcher": "write",
+      "action": {
+        "type": "command",
+        "command": "python guard.py"
+      }
+    }
+  },
+  {
+    "id": "trigger-post-tool-use",
+    "category": "trigger",
+    "expected_valid": true,
+    "hook": {
+      "name": "Tool review",
+      "trigger": "PostToolUse",
+      "matcher": "fs_.*",
+      "action": {
+        "type": "agent",
+        "prompt": "Review this result."
+      }
+    }
+  },
+  {
+    "id": "trigger-permission-request",
+    "category": "trigger",
+    "expected_valid": true,
+    "hook": {
+      "name": "Permission check",
+      "trigger": "PermissionRequest",
+      "matcher": "read_file",
+      "action": {
+        "type": "command",
+        "command": "python permission.py"
+      }
+    }
+  },
+  {
+    "id": "trigger-post-file-create",
+    "category": "trigger",
+    "expected_valid": true,
+    "hook": {
+      "name": "New Python file",
+      "trigger": "PostFileCreate",
+      "matcher": "\\.py$",
+      "action": {
+        "type": "command",
+        "command": "python add_tests.py"
+      }
+    }
+  },
+  {
+    "id": "trigger-post-file-save",
+    "category": "trigger",
+    "expected_valid": true,
+    "hook": {
+      "name": "Test on save",
+      "trigger": "PostFileSave",
+      "matcher": "\\.py$",
+      "action": {
+        "type": "command",
+        "command": "python -m unittest discover -s tests"
+      }
+    }
+  },
+  {
+    "id": "trigger-post-file-delete",
+    "category": "trigger",
+    "expected_valid": true,
+    "hook": {
+      "name": "Deleted import cleanup",
+      "trigger": "PostFileDelete",
+      "matcher": "\\.py$",
+      "action": {
+        "type": "agent",
+        "prompt": "Check for stale imports."
+      }
+    }
+  },
+  {
+    "id": "trigger-pre-compaction",
+    "category": "trigger",
+    "expected_valid": true,
+    "hook": {
+      "name": "Snapshot",
+      "trigger": "PreCompaction",
+      "action": {
+        "type": "command",
+        "command": "python snapshot.py"
+      }
+    }
+  },
+  {
+    "id": "trigger-post-compaction",
+    "category": "trigger",
+    "expected_valid": true,
+    "hook": {
+      "name": "Restore context",
+      "trigger": "PostCompaction",
+      "action": {
+        "type": "agent",
+        "prompt": "Recall the active task constraints."
+      }
+    }
+  },
+  {
+    "id": "legacy-camelcase-trigger",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "trigger",
+    "hook": {
+      "name": "Legacy",
+      "trigger": "fileEdited",
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "wrong-version",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "version",
+    "version": "1",
+    "hook": {
+      "name": "Wrong version",
+      "trigger": "Stop",
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "missing-command",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "required",
+    "hook": {
+      "name": "Missing command",
+      "trigger": "Stop",
+      "action": {
+        "type": "command"
+      }
+    }
+  },
+  {
+    "id": "missing-agent-prompt",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "required",
+    "hook": {
+      "name": "Missing prompt",
+      "trigger": "Stop",
+      "action": {
+        "type": "agent"
+      }
+    }
+  },
+  {
+    "id": "boolean-timeout",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "timeout_type",
+    "hook": {
+      "name": "Boolean timeout",
+      "trigger": "Stop",
+      "timeout": true,
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "string-enabled",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "enabled_type",
+    "hook": {
+      "name": "String enabled",
+      "trigger": "Stop",
+      "enabled": "false",
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "broken-regex",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "regex",
+    "hook": {
+      "name": "Broken regex",
+      "trigger": "PostFileSave",
+      "matcher": "[",
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "permission-agent-action",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "action_unsupported",
+    "hook": {
+      "name": "Invalid permission action",
+      "trigger": "PermissionRequest",
+      "action": {
+        "type": "agent",
+        "prompt": "Ask the agent."
+      }
+    }
+  },
+  {
+    "id": "unknown-action-field",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "unknown_field",
+    "hook": {
+      "name": "Unknown action field",
+      "trigger": "Stop",
+      "action": {
+        "type": "command",
+        "command": "true",
+        "cwd": "/tmp"
+      }
+    }
+  },
+  {
+    "id": "stop-with-matcher",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "matcher_unsupported",
+    "hook": {
+      "name": "Useless matcher",
+      "trigger": "Stop",
+      "matcher": ".*",
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "empty-hooks",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "required",
+    "hook": null,
+    "hooks": []
+  },
+  {
+    "id": "timeout-zero-valid",
+    "category": "boundary",
+    "expected_valid": true,
+    "hook": {
+      "name": "No timeout",
+      "trigger": "Stop",
+      "timeout": 0,
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "timeout-max-valid",
+    "category": "boundary",
+    "expected_valid": true,
+    "hook": {
+      "name": "Maximum timeout",
+      "trigger": "Stop",
+      "timeout": 86400,
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "blank-optionals-valid",
+    "category": "boundary",
+    "expected_valid": true,
+    "hook": {
+      "name": "Blank optionals",
+      "description": "",
+      "trigger": "PostFileSave",
+      "matcher": "",
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "disabled-hook-valid",
+    "category": "boundary",
+    "expected_valid": true,
+    "hook": {
+      "name": "Disabled",
+      "trigger": "Stop",
+      "enabled": false,
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "agent-action-valid",
+    "category": "action",
+    "expected_valid": true,
+    "hook": {
+      "name": "Agent review",
+      "trigger": "PostToolUse",
+      "matcher": "read_file",
+      "action": {
+        "type": "agent",
+        "prompt": "Review the tool result."
+      }
+    }
+  },
+  {
+    "id": "blank-name",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "required",
+    "hook": {
+      "name": "  ",
+      "trigger": "Stop",
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "long-name",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "length",
+    "hook": {
+      "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "trigger": "Stop",
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "description-type",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "type",
+    "hook": {
+      "name": "Bad description",
+      "description": 4,
+      "trigger": "Stop",
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "description-length",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "length",
+    "hook": {
+      "name": "Long description",
+      "description": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "trigger": "Stop",
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "unknown-hook-field",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "unknown_field",
+    "hook": {
+      "name": "Unknown field",
+      "trigger": "Stop",
+      "extra": true,
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "action-type",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "action_type",
+    "hook": {
+      "name": "Bad action",
+      "trigger": "Stop",
+      "action": {
+        "type": "shell",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "command-with-prompt",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "action_field",
+    "hook": {
+      "name": "Mixed action",
+      "trigger": "Stop",
+      "action": {
+        "type": "command",
+        "command": "true",
+        "prompt": "Review"
+      }
+    }
+  },
+  {
+    "id": "agent-with-command",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "action_field",
+    "hook": {
+      "name": "Mixed agent",
+      "trigger": "Stop",
+      "action": {
+        "type": "agent",
+        "prompt": "Review",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "negative-timeout",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "timeout_range",
+    "hook": {
+      "name": "Negative timeout",
+      "trigger": "Stop",
+      "timeout": -1,
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "oversized-timeout",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "timeout_range",
+    "hook": {
+      "name": "Oversized timeout",
+      "trigger": "Stop",
+      "timeout": 86401,
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "matcher-type",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "regex",
+    "hook": {
+      "name": "Bad matcher type",
+      "trigger": "PostFileSave",
+      "matcher": 4,
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "matcher-length",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "regex",
+    "hook": {
+      "name": "Long matcher",
+      "trigger": "PostFileSave",
+      "matcher": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "action": {
+        "type": "command",
+        "command": "true"
+      }
+    }
+  },
+  {
+    "id": "null-hook",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "type",
+    "hook": null
+  },
+  {
+    "id": "null-action",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "required",
+    "hook": {
+      "name": "Null action",
+      "trigger": "Stop",
+      "action": null
+    }
+  },
+  {
+    "id": "unknown-top-level-field",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "unknown_field",
+    "document": {
+      "version": "v1",
+      "hooks": [
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        }
+      ],
+      "extra": true
+    }
+  },
+  {
+    "id": "hooks-not-array",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "required",
+    "document": {
+      "version": "v1",
+      "hooks": {}
+    }
+  },
+  {
+    "id": "too-many-hooks",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "length",
+    "document": {
+      "version": "v1",
+      "hooks": [
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        },
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "wrong-version-type",
+    "category": "negative",
+    "expected_valid": false,
+    "expected_code": "version",
+    "document": {
+      "version": 1,
+      "hooks": [
+        {
+          "name": "Valid",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "true"
+          }
+        }
+      ]
+    }
+  }
 ]
