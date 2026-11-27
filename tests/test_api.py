@@ -172,6 +172,11 @@ class InputBoundaryTests(ServerCase):
         self.assertEqual(status, 400)
         self.assertEqual(json.loads(raw)["error"]["code"], "invalid_input")
 
+    def test_conflicting_content_length_rejected(self):
+        status, _, raw = self.raw_post((("Content-Type", "application/json"), ("Content-Length", "2"), ("Content-Length", "3")))
+        self.assertEqual(status, 400)
+        self.assertEqual(json.loads(raw)["error"]["code"], "invalid_input")
+
     def test_signed_content_length_rejected(self):
         status, _, raw = self.raw_post((("Content-Type", "application/json"), ("Content-Length", "+2")))
         self.assertEqual(status, 400)

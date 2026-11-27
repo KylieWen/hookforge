@@ -138,6 +138,17 @@ class HookForgeHandler(BaseHTTPRequestHandler):
         if 0 < length <= MAX_BODY:
             self.rfile.read(length)
 
+    def _discard_available_body(self) -> None:
+        """Drain bytes already sent so Windows does not reset a rejected reply."""
+        previous_timeout = self.connection.gettimeout()
+        try:
+            self.connection.settimeout(0.05)
+            self.rfile.read1(MAX_BODY)
+        except (OSError, ValueError):
+            pass
+        finally:
+            self.connection.settimeout(previous_timeout)
+
     def _discard_chunked_body(self) -> None:
         previous_timeout = self.connection.gettimeout()
         deadline = time.monotonic() + 0.5
@@ -191,12 +202,14 @@ class HookForgeHandler(BaseHTTPRequestHandler):
             self.close_connection = True
             if len(set(length_values)) == 1:
                 self._discard_small_body()
+            else:
+                self._discard_available_body()
             self._error(400, "invalid_input", "Exactly one Content-Length header is required.")
             return
         length_text = length_values[0].strip()
         if not length_text.isascii() or not length_text.isdigit():
             self.close_connection = True
-            self._discard_small_body()
+            self._discard_available_body()
             self._error(400, "invalid_input", "A valid, non-empty Content-Length is required.")
             return
         length = int(length_text)
@@ -205,6 +218,7 @@ class HookForgeHandler(BaseHTTPRequestHandler):
             return
         if length > MAX_BODY:
             self.close_connection = True
+            self._discard_available_body()
             self._error(413, "body_too_large", f"Request body must be at most {MAX_BODY} bytes.")
             return
         try:
