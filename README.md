@@ -26,7 +26,7 @@ The server binds to loopback only. Press Ctrl+C to stop.
 
 ## Static demo
 
-For GitHub Pages or any static host, serve the `frontend/` directory and open `?demo=1`:
+For GitHub Pages or any static host, serve the `frontend/` directory and open `?demo=1`. The published demo is https://kyliewen.github.io/hookforge/?demo=1:
 
 ```bash
 python -m http.server 8768 --directory frontend
@@ -109,7 +109,7 @@ python scripts/smoke_test.py
 node --check frontend/app.js  # optional, if Node is available
 ```
 
-The deterministic 94-test suite covers schema/action boundaries, all canonical triggers, regex failures, risk classes, simulation outcomes, export naming, API payload limits and routes, fixed benchmark expectations, static-demo synchronization, Pages-safe asset URLs, and non-execution using marker files plus process-spawn spies.
+The deterministic 95-test suite covers schema/action boundaries, all canonical triggers, regex failures, risk classes, simulation outcomes, export naming, API payload limits and routes, fixed benchmark expectations, static-demo synchronization, Pages-safe asset URLs, non-execution using marker files plus process-spawn spies, and stable rejection responses for malformed request framing on Windows.
 
 The fixed 47-case report is in `benchmarks/validation-benchmark.md`; its source fixtures are in `benchmarks/validation-cases.json`. It covers 13 canonical triggers, 18 valid-document cases, and 29 invalid-schema cases spanning document-level fields, action conditions, types, regex, and numeric/string boundaries. It measures HookForge's own documented contract, not official Kiro certification.
 

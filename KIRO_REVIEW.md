@@ -53,6 +53,16 @@ Kiro's original line references were approximate. The locations below are verifi
   - Unsupported edits are labeled as a static-demo limit rather than a server failure.
   - Re-importing a bundled export succeeded in both local and static demo modes; invalid hooks were rejected without replacing the current form.
 
+## Post-review Windows hardening
+
+Independent clean-ZIP testing later exposed intermittent `ConnectionAbortedError` responses when rejecting signed, conflicting, or oversized `Content-Length` headers on Windows. The handler now drains a bounded amount of already-sent request data before replying, and a conflicting-header regression was added. This work was performed and verified independently after Kiro's review; it is not attributed to Kiro.
+
+- `python -m unittest discover -s tests -v`: **95/95 passed**.
+- Oversized-body rejection: **50/50 consecutive runs passed**.
+- Signed and conflicting header rejection: **30/30 consecutive runs passed each**.
+- Final clean ZIP: **10/10 consecutive full-suite runs passed**.
+- `python scripts/benchmark.py`: **47/47 expectations met**.
+
 ## Kiro conclusion excerpt
 
 Kiro's final response stated that the codebase showed "strong security awareness with proper input validation, security headers, and a clear separation between analysis and execution" and that the core "never executes hooks" principle was maintained. Its main actionable finding was the regex-simulation concern, which was addressed and regression-tested as described above.
