@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Build, validate, and safely simulate Kiro IDE 1.x hook JSON without executing commands.">
+  <meta name="theme-color" content="#10110f">
+  <title>HookForge — Kiro hook studio</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#builder">Skip to builder</a>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="HookForge home">
+      <svg viewBox="0 0 36 36" aria-hidden="true"><path d="M7 7h22v8H20l-4 6H7V7Z"/><path d="M16 21h13v8H16z"/><path d="m12 24-4 5m12-5-4 5"/></svg>
+      <span>Hook<span>Forge</span></span>
+    </a>
+    <nav aria-label="Studio sections"><a href="#builder">Builder</a><a href="#simulator">Simulator</a><a href="#templates">Templates</a></nav>
+    <div class="safe-pill"><span class="status-dot"></span> Local · no execution</div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">KIRO IDE 1.x · STANDALONE HOOK STUDIO</p>
+        <h1 id="page-title">Shape the hook.<br><span>Keep the control.</span></h1>
+        <p class="hero-copy">Create valid <code>.kiro/hooks/&lt;id&gt;.json</code> files, inspect risk, and rehearse events. Every action stays inert—right here on your machine.</p>
+      </div>
+      <div class="hero-diagram" aria-hidden="true">
+        <div class="diagram-node"><small>EVENT</small><strong>PostFileSave</strong><span>src/app.py</span></div>
+        <div class="diagram-link"><i></i><span>match</span><i></i></div>
+        <div class="diagram-core"><svg viewBox="0 0 32 32"><path d="M6 5h20v8H18l-4 6H6V5Z"/><path d="M14 19h12v8H14z"/></svg><strong>HookForge</strong><span>inspect · decide · export</span></div>
+        <div class="diagram-link"><i></i><span>request</span><i></i></div>
+        <div class="diagram-node action-node"><small>ACTION</small><strong>Run tests</strong><span>not executed</span></div>
+      </div>
+    </section>
+
+    <section class="workspace" id="builder" aria-label="Hook builder">
+      <div class="panel form-panel">
+        <div class="panel-heading"><div><p class="section-kicker">01 / COMPOSE</p><h2>Hook definition</h2></div><div class="panel-actions"><button class="text-button" id="import-button" type="button">Import JSON</button><button class="text-button" id="reset-button" type="button">Reset</button></div></div>
+        <input id="import-file" type="file" accept="application/json,.json" hidden>
+        <form id="hook-form" autocomplete="off">
+          <div class="field-grid two">
+            <label class="field"><span>Name <b aria-hidden="true">*</b></span><input id="name" name="name" maxlength="200" required placeholder="Test Python on save"><small>A human-readable identifier.</small></label>
+            <label class="field"><span>Description</span><input id="description" name="description" maxlength="1000" placeholder="What this hook does"><small>Optional documentation for your team.</small></label>
+          </div>
+          <div class="field-grid two">
+            <label class="field"><span>Trigger <b aria-hidden="true">*</b></span><select id="trigger" name="trigger" required></select><small id="trigger-help">Choose the event to listen for.</small></label>
+            <label class="field"><span id="matcher-label">Matcher regex</span><input id="matcher" name="matcher" maxlength="512" placeholder="\.py$" spellcheck="false" aria-describedby="matcher-help"><small id="matcher-help">Regex applied to the event subject.</small></label>
+          </div>
+          <fieldset class="action-picker">
+            <legend>Action</legend>
+            <label><input type="radio" name="action-type" value="command" checked><span><strong>Command</strong><small>Shell command requested by Kiro</small></span></label>
+            <label><input type="radio" name="action-type" value="agent"><span><strong>Agent prompt</strong><small>Context injected into the agent</small></span></label>
+          </fieldset>
+          <label class="field" id="command-field"><span id="action-label">Command <b aria-hidden="true">*</b></span><textarea id="command" name="command" rows="4" maxlength="16384" spellcheck="false" placeholder="python -m unittest discover -s tests -v"></textarea><small id="action-help">Stored as text. HookForge never runs it.</small></label>
+          <label class="field" id="prompt-field" hidden><span>Agent prompt <b aria-hidden="true">*</b></span><textarea id="prompt" name="prompt" rows="4" maxlength="16384" placeholder="Review the changed file for missing tests."></textarea><small>Injected when the hook fires.</small></label>
+          <div class="field-grid two compact-fields">
+            <label class="field"><span>Timeout <em>seconds</em></span><input id="timeout" name="timeout" type="number" min="0" max="86400" step="1" value="60"><small><code>0</code> disables the command timeout.</small></label>
+            <label class="toggle-field"><input id="enabled" name="enabled" type="checkbox" checked><span><strong>Hook enabled</strong><small>Disabled hooks remain exportable.</small></span></label>
+          </div>
+        </form>
+        <div id="validation" class="validation" aria-live="polite"></div>
+      </div>
+
+      <div class="panel preview-panel">
+        <div class="panel-heading"><div><p class="section-kicker">02 / INSPECT</p><h2>Live JSON</h2></div><span id="schema-badge" class="badge">SCHEMA v1</span></div>
+        <div class="code-toolbar"><span id="export-path">.kiro/hooks/test-python-on-save.json</span><button id="copy-button" class="icon-button" type="button" aria-label="Copy JSON" title="Copy JSON"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/></svg></button></div>
+        <pre id="json-preview" tabindex="0" aria-label="Live JSON preview"><code>{}</code></pre>
+        <div class="preview-actions"><label class="field filename-field"><span>Export filename</span><input id="filename" maxlength="200" placeholder="Derived from hook name"></label><button id="download-button" class="primary-button" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 20h14"/></svg>Download JSON</button></div>
+        <p class="privacy-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Z"/><path d="m8 12 3 3 5-6"/></svg>Generated locally. Nothing is registered, installed, or sent anywhere.</p>
+        <div class="risk-section"><div class="subsection-heading"><h3>Command risk scan</h3><span id="risk-count" class="badge neutral">0 flags</span></div><div id="risk-results" aria-live="polite"></div></div>
+      </div>
+    </section>
+
+    <section class="simulator-section" id="simulator" aria-labelledby="simulator-title">
+      <div class="section-intro"><div><p class="section-kicker">03 / REHEARSE</p><h2 id="simulator-title">Safe event simulator</h2></div><span class="badge safe"><span class="status-dot"></span> DRY RUN ONLY</span></div>
+      <p class="section-copy">Send a synthetic event through the same trigger and matcher rules. HookForge shows the action Kiro would request—without executing a command, calling a tool, or contacting a network.</p>
+      <div class="simulator-grid">
+        <div class="sim-controls">
+          <label class="field"><span>Synthetic event</span><select id="event-trigger"></select></label>
+          <label class="field"><span id="event-subject-label">Event subject</span><input id="event-subject" maxlength="4096" placeholder="src/example.py" spellcheck="false"><small id="event-subject-help">File path, tool name, or prompt text.</small></label>
+          <button id="simulate-button" class="primary-button wide" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 10 7-10 7V5Z"/></svg>Simulate event</button>
+          <div class="safety-callout"><strong>No side effects. By design.</strong><p>The simulator has no command runner. Matcher patterns with dangerous backtracking are blocked from simulation, not from export.</p></div>
+        </div>
+        <div id="simulation-result" class="simulation-output" aria-live="polite">
+          <div class="empty-state"><div class="empty-icon">⌁</div><h3>Ready for a rehearsal</h3><p>Choose an event and subject, then simulate. You'll see each decision and the requested action.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="templates-section" id="templates" aria-labelledby="templates-title">
+      <div class="section-intro"><div><p class="section-kicker">04 / START FAST</p><h2 id="templates-title">Forged templates</h2></div><span class="subtle-label">EDIT EVERYTHING AFTER LOADING</span></div>
+      <div id="template-grid" class="template-grid"></div>
+    </section>
+
+    <details class="reference-details">
+      <summary>Schema notes & known boundaries <span>+</span></summary>
+      <div class="reference-grid">
+        <div><h3>What is supported</h3><p>Canonical IDE 1.x PascalCase triggers, command and agent actions, optional matchers, timeout seconds, enabled state, and PermissionRequest command-only validation. Stop is not treated as a blocking trigger.</p></div>
+        <div><h3>What is not simulated</h3><p>Kiro's runtime regex implementation, actual tool IDs in your installation, STDIN payload shape beyond the event subject, command output, exit codes, confirmation prompts, and hook ordering.</p></div>
+        <div><h3>Official reference</h3><p>Schema snapshot: 26 November 2026. Check the current <a href="https://kiro.dev/docs/hooks/" target="_blank" rel="noopener noreferrer">hook schema</a> and <a href="https://kiro.dev/docs/hooks/types/" target="_blank" rel="noopener noreferrer">trigger reference</a>. This MVP has not yet been reviewed in Kiro.</p></div>
+      </div>
+    </details>
+  </main>
+  <footer><span>HookForge · Kiroween 2026 entry</span><span>Python standard library · Vanilla web · MIT</span></footer>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

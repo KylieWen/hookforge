@@ -1,0 +1,426 @@
+{
+  "meta": {
+    "ok": true,
+    "triggers": [
+      {
+        "name": "SessionStart",
+        "subject": null,
+        "matcher": false,
+        "command_only": false,
+        "blocking": false
+      },
+      {
+        "name": "UserPromptSubmit",
+        "subject": "prompt text",
+        "matcher": true,
+        "command_only": false,
+        "blocking": true
+      },
+      {
+        "name": "Stop",
+        "subject": null,
+        "matcher": false,
+        "command_only": false,
+        "blocking": false
+      },
+      {
+        "name": "PreTaskExec",
+        "subject": null,
+        "matcher": false,
+        "command_only": false,
+        "blocking": true
+      },
+      {
+        "name": "PostTaskExec",
+        "subject": null,
+        "matcher": false,
+        "command_only": false,
+        "blocking": false
+      },
+      {
+        "name": "PreToolUse",
+        "subject": "tool name",
+        "matcher": true,
+        "command_only": false,
+        "blocking": true
+      },
+      {
+        "name": "PostToolUse",
+        "subject": "tool name",
+        "matcher": true,
+        "command_only": false,
+        "blocking": false
+      },
+      {
+        "name": "PermissionRequest",
+        "subject": "tool name",
+        "matcher": true,
+        "command_only": true,
+        "blocking": false
+      },
+      {
+        "name": "PostFileCreate",
+        "subject": "file path",
+        "matcher": true,
+        "command_only": false,
+        "blocking": false
+      },
+      {
+        "name": "PostFileSave",
+        "subject": "file path",
+        "matcher": true,
+        "command_only": false,
+        "blocking": false
+      },
+      {
+        "name": "PostFileDelete",
+        "subject": "file path",
+        "matcher": true,
+        "command_only": false,
+        "blocking": false
+      },
+      {
+        "name": "PreCompaction",
+        "subject": null,
+        "matcher": false,
+        "command_only": false,
+        "blocking": false
+      },
+      {
+        "name": "PostCompaction",
+        "subject": null,
+        "matcher": false,
+        "command_only": false,
+        "blocking": false
+      }
+    ],
+    "templates": [
+      {
+        "id": "post-file-save-tests",
+        "title": "PostFileSave test runner",
+        "eyebrow": "VERIFY ON SAVE",
+        "description": "Run the project's standard-library tests after an agent saves a Python file.",
+        "hook": {
+          "name": "Test Python on save",
+          "description": "Run tests after agent-edited Python files are saved.",
+          "trigger": "PostFileSave",
+          "matcher": "\\.py$",
+          "action": {
+            "type": "command",
+            "command": "python -m unittest discover -s tests -v"
+          },
+          "timeout": 120,
+          "enabled": true
+        }
+      },
+      {
+        "id": "pre-tool-use-guard",
+        "title": "PreToolUse guard",
+        "eyebrow": "PROTECT SECRETS",
+        "description": "Block agent write tools when the requested path targets a .env file.",
+        "hook": {
+          "name": "Guard .env writes",
+          "description": "Exit 2 to block writes to .env files before the tool executes.",
+          "trigger": "PreToolUse",
+          "matcher": "write",
+          "action": {
+            "type": "command",
+            "command": "python -c \"import json,sys; e=json.load(sys.stdin); p=str(e.get('tool_input',{}).get('path','')).replace(chr(92),'/'); sys.exit(2 if p.endswith('.env') or '/.env' in p else 0)\""
+          },
+          "timeout": 10,
+          "enabled": true
+        }
+      },
+      {
+        "id": "stop-test-gate",
+        "title": "Stop test gate",
+        "eyebrow": "CHECK BEFORE DONE",
+        "description": "Run tests when the agent stops. Failures are reported; Stop itself cannot block completion.",
+        "hook": {
+          "name": "Test gate at stop",
+          "description": "Run the test suite when the agent completes its turn.",
+          "trigger": "Stop",
+          "action": {
+            "type": "command",
+            "command": "python -m unittest discover -s tests -v"
+          },
+          "timeout": 120,
+          "enabled": true
+        }
+      }
+    ]
+  },
+  "samples": {
+    "post-file-save-tests": {
+      "hook": {
+        "name": "Test Python on save",
+        "description": "Run tests after agent-edited Python files are saved.",
+        "trigger": "PostFileSave",
+        "matcher": "\\.py$",
+        "action": {
+          "type": "command",
+          "command": "python -m unittest discover -s tests -v"
+        },
+        "enabled": true,
+        "timeout": 120
+      },
+      "default_event": {
+        "trigger": "PostFileSave",
+        "subject": "src/example.py"
+      },
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "regex": {
+          "ok": true,
+          "kind": "regex",
+          "message": "Valid regular expression."
+        }
+      },
+      "risk": {
+        "warnings": [],
+        "summary": {
+          "high": 0,
+          "medium": 0
+        },
+        "advisory": "Heuristic text analysis only; absence of warnings does not establish safety."
+      },
+      "export": {
+        "ok": true,
+        "filename": "test-python-on-save.json",
+        "path": ".kiro/hooks/test-python-on-save.json",
+        "content": "{\n  \"version\": \"v1\",\n  \"hooks\": [\n    {\n      \"name\": \"Test Python on save\",\n      \"description\": \"Run tests after agent-edited Python files are saved.\",\n      \"trigger\": \"PostFileSave\",\n      \"matcher\": \"\\\\.py$\",\n      \"action\": {\n        \"type\": \"command\",\n        \"command\": \"python -m unittest discover -s tests -v\"\n      },\n      \"enabled\": true,\n      \"timeout\": 120\n    }\n  ]\n}\n",
+        "document": {
+          "version": "v1",
+          "hooks": [
+            {
+              "name": "Test Python on save",
+              "description": "Run tests after agent-edited Python files are saved.",
+              "trigger": "PostFileSave",
+              "matcher": "\\.py$",
+              "action": {
+                "type": "command",
+                "command": "python -m unittest discover -s tests -v"
+              },
+              "enabled": true,
+              "timeout": 120
+            }
+          ]
+        }
+      },
+      "simulations": [
+        {
+          "event": {
+            "trigger": "PostFileSave",
+            "subject": "src/example.py"
+          },
+          "result": {
+            "dry_run": true,
+            "executed": false,
+            "fired": true,
+            "action_requested": {
+              "type": "command",
+              "executed": false,
+              "command": "python -m unittest discover -s tests -v",
+              "timeout_seconds": 120,
+              "timeout_disabled": false
+            },
+            "status": "would_fire",
+            "reason": "matcher found a match",
+            "note": "The action is displayed only. No command, tool, network request, or agent prompt was run."
+          }
+        },
+        {
+          "event": {
+            "trigger": "PostFileSave",
+            "subject": "README.md"
+          },
+          "result": {
+            "dry_run": true,
+            "executed": false,
+            "fired": false,
+            "action_requested": null,
+            "status": "no_match",
+            "reason": "matcher did not find a match"
+          }
+        }
+      ]
+    },
+    "pre-tool-use-guard": {
+      "hook": {
+        "name": "Guard .env writes",
+        "description": "Exit 2 to block writes to .env files before the tool executes.",
+        "trigger": "PreToolUse",
+        "matcher": "write",
+        "action": {
+          "type": "command",
+          "command": "python -c \"import json,sys; e=json.load(sys.stdin); p=str(e.get('tool_input',{}).get('path','')).replace(chr(92),'/'); sys.exit(2 if p.endswith('.env') or '/.env' in p else 0)\""
+        },
+        "enabled": true,
+        "timeout": 10
+      },
+      "default_event": {
+        "trigger": "PreToolUse",
+        "subject": "fs_write"
+      },
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "regex": {
+          "ok": true,
+          "kind": "regex",
+          "message": "Valid regular expression."
+        }
+      },
+      "risk": {
+        "warnings": [],
+        "summary": {
+          "high": 0,
+          "medium": 0
+        },
+        "advisory": "Heuristic text analysis only; absence of warnings does not establish safety."
+      },
+      "export": {
+        "ok": true,
+        "filename": "guard-env-writes.json",
+        "path": ".kiro/hooks/guard-env-writes.json",
+        "content": "{\n  \"version\": \"v1\",\n  \"hooks\": [\n    {\n      \"name\": \"Guard .env writes\",\n      \"description\": \"Exit 2 to block writes to .env files before the tool executes.\",\n      \"trigger\": \"PreToolUse\",\n      \"matcher\": \"write\",\n      \"action\": {\n        \"type\": \"command\",\n        \"command\": \"python -c \\\"import json,sys; e=json.load(sys.stdin); p=str(e.get('tool_input',{}).get('path','')).replace(chr(92),'/'); sys.exit(2 if p.endswith('.env') or '/.env' in p else 0)\\\"\"\n      },\n      \"enabled\": true,\n      \"timeout\": 10\n    }\n  ]\n}\n",
+        "document": {
+          "version": "v1",
+          "hooks": [
+            {
+              "name": "Guard .env writes",
+              "description": "Exit 2 to block writes to .env files before the tool executes.",
+              "trigger": "PreToolUse",
+              "matcher": "write",
+              "action": {
+                "type": "command",
+                "command": "python -c \"import json,sys; e=json.load(sys.stdin); p=str(e.get('tool_input',{}).get('path','')).replace(chr(92),'/'); sys.exit(2 if p.endswith('.env') or '/.env' in p else 0)\""
+              },
+              "enabled": true,
+              "timeout": 10
+            }
+          ]
+        }
+      },
+      "simulations": [
+        {
+          "event": {
+            "trigger": "PreToolUse",
+            "subject": "fs_write"
+          },
+          "result": {
+            "dry_run": true,
+            "executed": false,
+            "fired": true,
+            "action_requested": {
+              "type": "command",
+              "executed": false,
+              "command": "python -c \"import json,sys; e=json.load(sys.stdin); p=str(e.get('tool_input',{}).get('path','')).replace(chr(92),'/'); sys.exit(2 if p.endswith('.env') or '/.env' in p else 0)\"",
+              "timeout_seconds": 10,
+              "timeout_disabled": false
+            },
+            "status": "would_fire",
+            "reason": "category 'write' matched 'fs_write'",
+            "note": "The action is displayed only. No command, tool, network request, or agent prompt was run."
+          }
+        },
+        {
+          "event": {
+            "trigger": "PreToolUse",
+            "subject": "read_file"
+          },
+          "result": {
+            "dry_run": true,
+            "executed": false,
+            "fired": false,
+            "action_requested": null,
+            "status": "no_match",
+            "reason": "category 'write' did not match 'read_file'"
+          }
+        }
+      ]
+    },
+    "stop-test-gate": {
+      "hook": {
+        "name": "Test gate at stop",
+        "description": "Run the test suite when the agent completes its turn.",
+        "trigger": "Stop",
+        "matcher": "",
+        "action": {
+          "type": "command",
+          "command": "python -m unittest discover -s tests -v"
+        },
+        "enabled": true,
+        "timeout": 120
+      },
+      "default_event": {
+        "trigger": "Stop",
+        "subject": ""
+      },
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "regex": {
+          "ok": true,
+          "kind": "always",
+          "message": "Matches every event."
+        }
+      },
+      "risk": {
+        "warnings": [],
+        "summary": {
+          "high": 0,
+          "medium": 0
+        },
+        "advisory": "Heuristic text analysis only; absence of warnings does not establish safety."
+      },
+      "export": {
+        "ok": true,
+        "filename": "test-gate-at-stop.json",
+        "path": ".kiro/hooks/test-gate-at-stop.json",
+        "content": "{\n  \"version\": \"v1\",\n  \"hooks\": [\n    {\n      \"name\": \"Test gate at stop\",\n      \"description\": \"Run the test suite when the agent completes its turn.\",\n      \"trigger\": \"Stop\",\n      \"action\": {\n        \"type\": \"command\",\n        \"command\": \"python -m unittest discover -s tests -v\"\n      },\n      \"enabled\": true,\n      \"timeout\": 120\n    }\n  ]\n}\n",
+        "document": {
+          "version": "v1",
+          "hooks": [
+            {
+              "name": "Test gate at stop",
+              "description": "Run the test suite when the agent completes its turn.",
+              "trigger": "Stop",
+              "action": {
+                "type": "command",
+                "command": "python -m unittest discover -s tests -v"
+              },
+              "enabled": true,
+              "timeout": 120
+            }
+          ]
+        }
+      },
+      "simulations": [
+        {
+          "event": {
+            "trigger": "Stop",
+            "subject": ""
+          },
+          "result": {
+            "dry_run": true,
+            "executed": false,
+            "fired": true,
+            "action_requested": {
+              "type": "command",
+              "executed": false,
+              "command": "python -m unittest discover -s tests -v",
+              "timeout_seconds": 120,
+              "timeout_disabled": false
+            },
+            "status": "would_fire",
+            "reason": "matcher found a match",
+            "note": "The action is displayed only. No command, tool, network request, or agent prompt was run."
+          }
+        }
+      ]
+    }
+  },
+  "notice": "Static demo supports bundled templates and events only. Run the local app for arbitrary input."
+}
