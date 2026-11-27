@@ -4,7 +4,7 @@
 
 HookForge helps developers compose `.kiro/hooks/<id>.json` without guessing the schema. It provides a guided form, live JSON, schema and regex validation, heuristic command risk warnings, three editable templates, safe event simulation, and a sanitized JSON download.
 
-HookForge is an original Kiroween 2026 MVP. **It has not yet been reviewed or exercised in real Kiro usage.** That review is planned separately.
+HookForge is an original Kiroween 2026 MVP. **It was reviewed in Kiro IDE 1.4.236 through a live read-only session**, and the confirmed findings were fixed and independently retested; see `KIRO_REVIEW.md`.
 
 ## Quick start
 
