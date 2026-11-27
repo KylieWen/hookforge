@@ -196,6 +196,7 @@ class HookForgeHandler(BaseHTTPRequestHandler):
         length_text = length_values[0].strip()
         if not length_text.isascii() or not length_text.isdigit():
             self.close_connection = True
+            self._discard_small_body()
             self._error(400, "invalid_input", "A valid, non-empty Content-Length is required.")
             return
         length = int(length_text)
